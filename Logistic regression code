@@ -1,0 +1,160 @@
+# platform : google colab
+# using Binary logistic regression for predicting any missing values in a dataset
+
+
+# logistic regression predicts something is true or false instead of predicting something continuous
+# it is a special case of linear regression
+# it is also called as sigmoid function
+# sigmoid function = 1/(1+e^-value)
+
+import pandas as pd                 #importing all the necessary libraries
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+%matplotlib inline
+from sklearn.model_selection import train_test_split
+
+from sklearn.metrics import classification_report , accuracy_score
+from sklearn.metrics import confusion_matrix
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
+import seaborn as sns
+
+
+data_df = pd.read_csv('/content/preterm.csv')  # reading the path of the dataset
+data_df.head()       # displaying the parameters of the dataset
+
+data_df.columns       # displaying the number of columns of dataset
+data_df[['Count Contraction', 'lenght of contraction', 'STD', 'Entropy',
+       'Contraction times', 'Pre-term']]
+
+data_df.isna()     # any missing values      
+# or data_df.isna().any()  
+
+data_df[['Count Contraction', 'lenght of contraction', 'STD', 'Entropy',
+       'Contraction times', 'Pre-term']].describe() 
+
+# The describe() method returns description of the data in the DataFrame.
+
+# If the DataFrame contains numerical data, the description contains these information for each column:
+
+# count - The number of not-empty values.
+# mean - The average (mean) value.
+# std - The standard deviation.
+# min - the minimum value.
+# 25% - The 25% percentile*.
+# 50% - The 50% percentile*.
+# 75% - The 75% percentile*.
+# max - the maximum value.
+
+# *Percentile meaning: how many of the values are less than the given percentile.       
+
+data_df.columns       # displaying the number of columns of dataset
+data_df[['Count Contraction', 'lenght of contraction', 'STD', 'Entropy',
+       'Contraction times', 'Pre-term']]
+
+# percentage of total number of not  preterm
+npreterm = 0
+notpreterm = data_df['Pre-term']
+for i in range (len(notpreterm)):
+  if notpreterm[i] ==0:
+    npreterm = npreterm+1
+len(notpreterm)
+
+per_nf = (npreterm/len(notpreterm))*100
+print('percentage of not preterm babies:',per_nf)
+
+# percentage of total number of  pretterm
+pterm = 0
+preterm = data_df['Pre-term']
+for i in range (len(preterm)):
+  if preterm[i] ==1:
+     pterm = pterm + 1
+len(preterm)
+   
+
+per_nf = (pterm/len(preterm))*100
+print('percentage of not preterm babies:',per_nf)
+
+# correlation matrix
+# The measure of the relationship between two variables statistically is called "Correlation".
+# Given a vast amount of observed data, it is hard to determine how closely two variables are related. 
+# It is a major need for data science and data analysis. 
+# Statistical techniques are used to organize all the data to get the correlation view, and for that,
+# graphs and other representations are made.
+
+correlation_metrics = data_df.corr()
+fig = plt.figure(figsize = (8,8))
+sns.heatmap(correlation_metrics , vmax = 0.9 , square = True)
+plt.show()
+
+# A correlation matrix is simply a table which displays the correlation coefficients for different variables.
+# The matrix depicts the correlation between all the possible pairs of values in a table. 
+# It is a powerful tool to summarize a large dataset and to identify and visualize patterns in the given data
+
+x = data_df.drop(['Contraction times'] , axis = 1)
+y = data_df['Contraction times']
+xtrain , xtest , ytrain , ytest = train_test_split(x,y, test_size = 0.2 , random_state =42)
+xtest.shape
+logisticreg = LogisticRegression()
+logisticreg.fit(xtrain , ytrain)
+
+
+# x_train : The training part of the first sequence ( x )
+# x_test : The test part of the first sequence ( x ) 
+# y_train : The training part of the second sequence ( y )
+# y_test : The test part of the second sequence ( y )
+
+y_pred = logisticreg.predict(xtest)
+logisticsreg = LogisticRegression()
+y_pred
+
+
+accuracy = logisticreg.score(xtest , ytest)
+cm = metrics.confusion_matrix(ytest , y_pred)
+print(cm)
+
+print('accuracy score of the logistic regression model is :', accuracy*100,'%')
+
+x = data_df.drop(['Pre-term'] , axis = 1)
+y = data_df['Pre-term']
+xtrain , xtest , ytrain , ytest = train_test_split(x,y, test_size = 0.2 , random_state =42)
+xtest.shape
+logisticreg = LogisticRegression()
+logisticreg.fit(xtrain , ytrain)
+
+y_pred = logisticreg.predict(xtest)
+logisticsreg = LogisticRegression()
+y_pred
+
+accuracy = logisticreg.score(xtest , ytest)
+cm = metrics.confusion_matrix(ytest , y_pred)
+print(cm)
+
+print('accuracy score of the logistic regression model is :', accuracy*100,'%')
+
+
+sns.barplot(x = 'Pre-term',y = 'Contraction times' , data = data_df)
+plt.show()
+
+#from os import terminal_size
+#data_df[['Count Contraction', 'lenght of contraction', 'STD', 'Entropy',
+#       'Contraction times', 'Pre-term']]
+
+y = np.array([91, 100])
+mylabels = ['Contraction times', 'Pre-term']
+
+#myexplode = [0.2, 0]
+
+plt.pie( y ,  labels = mylabels ,  startangle = 90 ) # , explode = myexplode , shadow = True)
+#fig = plt.figure(figsize =(10, 7))
+plt.title("Line chart displaying the direct relationship between two parameters")
+# show plot
+plt.show()
+
+
+#lineplot
+import seaborn as sns
+sns.lineplot(x = 'Pre-term',y = 'Contraction times',data = data_df)
+plt.title("Line chart displaying the direct relationship between two parameters")
+plt.show()
